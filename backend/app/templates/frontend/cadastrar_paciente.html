@@ -1,0 +1,568 @@
+<html lang="en">
+{% load static %}
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Clinica EH</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link type="image/png" href="{% static "img/logo2a.PNG" %}" rel="icon">
+  <link href="{% static "img/logo.png" %}" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static "vendor/bootstrap/css/bootstrap.min.css" %}" rel="stylesheet">
+  <link href="{% static "vendor/bootstrap-icons/bootstrap-icons.css" %}" rel="stylesheet">
+  <link href="{% static "vendor/boxicons/css/boxicons.min.css" %}" rel="stylesheet">
+  <link href="{% static "vendor/quill/quill.snow.css" %}" rel="stylesheet">
+  <link href="{% static "vendor/quill/quill.bubble.css" %}" rel="stylesheet">
+  <link href="{% static "vendor/remixicon/remixicon.css" %}" rel="stylesheet">
+  <link href="{% static "vendor/simple-datatables/style.css" %}" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="{% static "css/style.css" %}" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: NiceAdmin
+  * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
+  * Updated: Apr 20 2024 with Bootstrap v5.3.3
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center" style="background-color:rgb(76, 87, 90);">
+
+    <div class="d-flex align-items-center justify-content-between" >
+      <a href="index" class="d-flex align-items-center">
+        <img src="{% static "img/clinicaeh.jpeg" %}" height="50px">
+      </a>
+      <i class="bi bi-list toggle-sidebar-btn"></i>
+    </div><!-- End Logo -->
+
+    <!-- End Search Bar -->
+
+    <nav class="header-nav ms-auto">
+      <ul class="d-flex align-items-center">
+
+        <li class="nav-item d-block d-lg-none">
+          <a class="nav-link nav-icon search-bar-toggle" href="#">
+            <i class="bi bi-search" style="color: rgb(53, 45, 45);"></i>
+          </a>
+        </li><!-- End Search Icon-->
+
+        
+
+        <li class="nav-item dropdown pe-3">
+
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+            <span class="d-none d-md-block dropdown-toggle ps-2" style="color: white;">{{ user.username }}</span>
+          </a><!-- End Profile Iamge Icon -->
+
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+            <li class="dropdown-header">
+              <h6>{{ user.username }}</h6>
+              <span>              {% if user.groups.all %}
+                {% for group in user.groups.all %}
+                    {{ group.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            {% else %}
+                Nenhum grupo
+            {% endif %}</span>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="pagina_usuario">
+                <i class="bi bi-person"></i>
+                <span>Minha conta</span>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <form action="{% url 'logout' %}" method="POST" class="dropdown-item d-flex align-items-center" href="{% url 'logout' %}">{%csrf_token%}
+                <button class="dropdown-item d-flex align-items-center" type="submit">
+                  <i class="bi bi-box-arrow-right"></i>
+                  <span>Fazer logout</span>
+                </button>
+              </form>
+          </li>
+
+          </ul><!-- End Profile Dropdown Items -->
+        </li><!-- End Profile Nav -->
+
+      </ul>
+    </nav><!-- End Icons Navigation -->
+
+  </header><!-- End Header -->
+
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="index">
+          <i class="bi bi-grid"></i>
+          <span>Dashboard</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+      <li class="nav-item">
+        <a class="nav-link " href="pacientes">
+          <i class="bi bi-person"></i>
+          <span>Pacientes</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="calendario">
+          <i class="bi bi-calendar"></i>
+          <span>Calendario</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="financeiro">
+          <i class="bi bi-currency-dollar"></i>
+          <span>Financeiro</span>
+        </a>
+      </li>
+      
+
+    </ul>
+
+  </aside><!-- End Sidebar-->
+
+  
+
+  </main><!-- End #main -->
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Pacientes</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index">Home</a></li>
+          <li class="breadcrumb-item active">Pacientes</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                
+                <h5 class="card-title">Cadastrar</h5>
+                <a href="cadastrar_paciente"> <button type="button" class="btn btn-primary w-25">Cadastrar Paciente</button></a>
+                <a href="pacientes"><button type="button" class="btn btn-secondary w-25">Localizar Paciente</button></a>
+            </div>
+            </div>
+            
+              
+                
+                <!-- Table with stripped rows -->
+                <div class="card">
+                    <div class="card-body">
+                      <p>*Campos Obrigatorio</p>
+                      <h5 class="card-title">Cadastrar Paciente</h5>
+        
+                      <!-- General Form Elements -->
+                      <form action={% url 'cadastrar_paciente' %} method="POST" onsubmit="return validateForm()" >  {% csrf_token %}
+                        <div class="row mb-3">
+                          <label for="inputText" class="col-sm-2 col-form-label">Nome*</label>
+                          <div class="col-sm-10">
+                            <input type="text" class="form-control" name="nome" id="inputText" required>
+                          </div>
+                        </div>
+                        
+                        <fieldset class="row mb-3">
+                            <legend class="col-form-label col-sm-2 pt-0">Gênero*</legend>
+                            <div class="col-sm-10">
+                              <div class="form-check">
+                                <input class="form-check-input" type="radio" name="genero" id="gridRadios1" value="Masculino" checked>
+                                <label class="form-check-label" for="gridRadios1">
+                                  Masculino
+                                </label>
+                              </div>
+                              <div class="form-check">
+                                <input class="form-check-input" type="radio" name="genero" id="gridRadios2" value="Feminino">
+                                <label class="form-check-label" for="gridRadios2">
+                                  Feminino
+                                </label>
+                              </div>
+                              <div class="form-check">
+                                <input class="form-check-input" type="radio" name="genero" id="gridRadios" value="Outro" >
+                                <label class="form-check-label" for="gridRadios3">
+                                  Outro
+                                </label>
+                              </div>
+                            </div>
+                          </fieldset>
+                          <div class="row mb-3">
+                            <label for="inputDate" class="col-sm-2 col-form-label">Data de cadastro*
+                            </label>
+                            <div class="col-sm-10">
+                              <input type="date" name="data_cadastro" class="form-control">
+                            </div>
+                          </div> 
+                        
+                        
+                        <div class="row mb-3">
+                          <label for="inputDate" class="col-sm-2 col-form-label">Data de nascimento*
+                          </label>
+                          <div class="col-sm-10">
+                            <input type="date" class="form-control" name="data_nascimento">
+                          </div>
+                        </div>                            
+                        <div class="row mb-3">
+                          <label for="inputText" class="col-sm-2 col-form-label">Observações*</label>
+                          <div class="col-sm-10">
+                            <textarea class="form-control" name="observaçoes" style="height: 100px"></textarea>
+                          </div>
+                        </div>
+                        
+                          
+                          <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Local de nascimento*</label>
+                            <div class="col-sm-10">
+                              <input type="text" name="local_nascimento" class="form-control">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label">Estado civil*</label>
+                            <div class="col-sm-10">
+                              <select class="form-select" name="estado_civil" aria-label="Default select example">
+                                <option selected></option>
+                                <option value="solteiro(a)">Solteiro(a)</option>
+                                <option value="casado(a)">Casado(a)</option>
+                                <option value="viúvo(a)">Viúvo(a)</option>
+                                <option value="divorciado(a)">Divorciado(a)</option>
+                                <option value="desquitado(a)">Desquitado(a)</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label">Grupo*</label>
+                            <div class="col-sm-10">
+                              <select name="grupo" class="form-select" aria-label="Default select example">
+                                <option selected value="Definitivo">Definitivo</option>
+                                <option value="Clínico">Clínico</option>
+                                <option value="Contenção">Contenção</option>
+                                <option value="Excluido">Excluido.</option>
+                                <option value="Pré-Tratamento">Pré-tratamento</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label">Situação atual*</label>
+                            <div class="col-sm-10">
+                              <select class="form-select" name="situacao_atual" aria-label="Default select example">
+                                <option selected value="1ªConsulta">1ªConsulta</option>
+                                <option value="1ªrevisão">1ªRevisão</option>
+                                <option value="2ªrevisão">2ªRevisão</option>
+                                <option value="3ªrevisão">3ªRevisão</option>
+                                <option value="4ªrevisão">4ªRevisão</option>
+                                <option value="5ªrevisão">5ªRevisão</option>
+                                <option value="Abandono">Abandono</option>
+                                <option value="Acompanhamento Pós-Contenção">Acompanhamento Pós-Contenção</option>
+                                <option value="Advogado">Advogado</option>
+                                <option value="Alta">Alta</option>
+                                <option value="Alta Temporária">Alta Temporária</option>
+                                <option value="Cartas - Parcelas em Atraso">Cartas - Parcelas em Atraso</option>
+                                <option value="Controle">Controle</option>
+                                <option value="Convênio - Em andamento">Convênio - Em andamento</option>
+                                <option value="Convênio - Finalizou">Convênio - Finalizou</option>
+                                <option value="Convênio - Pericia">Convênio - Pericia</option>
+                                <option value="Convênio-Aprovação">Convênio-Aprovação</option>
+                                <option value="Em Contenção">Em Contenção</option>
+                                <option value="Em Tratamento">Em Tratamento</option>
+                                <option value="Faltando Documento">Faltando Documento</option>
+                                <option value="Finalizou">Finalizou</option>
+                                <option value="Finalizou - Devedor">Finalizou - Devedor</option>
+                                <option value="Finalizou - Removeu">Finalizou - Removeu</option>
+                                <option value="Inativo">Inativo</option>
+                                <option value="Não Finalizou">Não Finalizou</option>
+                                <option value="Orç. Fono">Orç. Fono</option>
+                                <option value="Remoção da Barra 3-3">Remoção da Barra 3-3</option>
+                                <option value="Só Acompanhamento">Só Acompanhamento</option>
+                                <option value="SPC">SPC</option>
+
+                              </select>
+                            </div>
+                          </div>
+                          <hr>
+                          <h4 class="card-title">Contato</h4>
+                          <div class="container mt-5">
+                              <div class="row mb-3">
+                                <div class="col-md-6">
+                                  <label for="celular" class="form-label">Celular*</label>
+                                  <input type="tel" name="celular" class="form-control" id="celular" placeholder="(XX) XXXXX-XXXX">
+                                </div>
+                                <div class="col-md-6">
+                                  <label for="email" class="form-label">Email*</label>
+                                  <input type="email" name="email" class="form-control" id="email" placeholder="email@example.com">
+                                </div>
+                              </div>
+                          </div>
+                          <hr>
+                          <h4 class="card-title">Endereço</h4>   
+                          
+                          <div class="row mb-3">
+                            <label for="cep" class="col-sm-2 col-form-label">CEP:*</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="cep" class="form-control" id="cep" placeholder="Digite o seu CEP" maxlength="9" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <label for="endereco" class="col-sm-2 col-form-label">Endereço*</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="endereco" class="form-control" id="endereco" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <label for="numero" class="col-sm-2 col-form-label">Número*</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="numero" class="form-control" id="numero" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <label for="complemento" class="col-sm-2 col-form-label">Complemento*</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="complemento" class="form-control" id="complemento">
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <label for="bairro" class="col-sm-2 col-form-label">Bairro*</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="bairro" class="form-control" id="bairro" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <label for="cidade" class="col-sm-2 col-form-label">Cidade*</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="cidade" class="form-control" id="cidade" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <label for="estado" class="col-sm-2 col-form-label">Estado*</label>
+                            <div class="col-sm-10">
+                                <select class="form-select" name="estado" id="estado" required>
+                                    <option selected></option>
+                                    <option value="AC">AC</option>
+                                    <option value="AL">AL</option>
+                                    <option value="AP">AP</option>
+                                    <option value="AM">AM</option>
+                                    <option value="BA">BA</option>
+                                    <option value="CE">CE</option>
+                                    <option value="DF">DF</option>
+                                    <option value="ES">ES</option>
+                                    <option value="GO">GO</option>
+                                    <option value="MA">MA</option>
+                                    <option value="MT">MT</option>
+                                    <option value="MS">MS</option>
+                                    <option value="MG">MG</option>
+                                    <option value="PA">PA</option>
+                                    <option value="PB">PB</option>
+                                    <option value="PR">PR</option>
+                                    <option value="PE">PE</option>
+                                    <option value="PI">PI</option>
+                                    <option value="RJ">RJ</option>
+                                    <option value="RN">RN</option>
+                                    <option value="RS">RS</option>
+                                    <option value="RO">RO</option>
+                                    <option value="RR">RR</option>
+                                    <option value="SC">SC</option>
+                                    <option value="SP">SP</option>
+                                    <option value="SE">SE</option>
+                                    <option value="TO">TO</option>
+                                </select>
+                            </div>
+                        </div>
+                        <script>
+                          document.getElementById('cep').addEventListener('blur', function () {
+                            const cep = this.value.replace(/\D/g, ''); // Remove caracteres não numéricos
+                        
+                            if (cep.length === 8) {
+                                fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.erro) {
+                                            alert('CEP não encontrado.');
+                                            return;
+                                        }
+                                        // Preenche os campos com os dados retornados
+                                        document.getElementById('endereco').value = data.logradouro;
+                                        document.getElementById('bairro').value = data.bairro;
+                                        document.getElementById('cidade').value = data.localidade;
+                                        document.getElementById('estado').value = data.uf;
+                                    })
+                                    .catch(error => {
+                                        console.error('Erro ao buscar o CEP:', error);
+                                        alert('Erro ao buscar o CEP. Tente novamente.');
+                                    });
+                            } else {
+                                alert('CEP inválido. Por favor, digite 8 dígitos.');
+                            }
+                        });
+                        </script>                        
+
+                          <hr>
+                          <h4 class="card-title">Documentos</h4>
+                          <div class="row mb-3">
+                            <label for="inputNumber" class="col-sm-2 col-form-label">CPF*</label>
+                            <div class="col-sm-10">
+                              <input type="number" name="cpf" class="form-control" placeholder="000.000.000-00">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="inputNumber" class="col-sm-2 col-form-label">RG*</label>
+                            <div class="col-sm-10">
+                              <input type="text" name="rg" class="form-control" placeholder="00.000.000-0">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Órgão emissor*</label>
+                            <div class="col-sm-10">
+                              <input type="text" name="orgao_emissor" class="form-control">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label">Convénio*</label>
+                            <div class="col-sm-10">
+                              <select class="form-select" name="convénio" aria-label="Default select example">
+                                <option selected></option>
+                                <option value="Tabela Tuss">Tabela Tuss</option>
+                                <option value="Particular">Particular</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Plano*</label>
+                            <div class="col-sm-10">
+                              <input type="text" nama="plano" class="form-control">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="inputDate" class="col-sm-2 col-form-label">Data de adesão*
+                            </label>
+                            <div class="col-sm-10">
+                              <input type="date" name="data_adesao" class="form-control">
+                            </div>
+                          </div>  
+                          <hr>
+                          <h4 class="card-title">Familia</h4>
+                          <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Nome do pai</label>
+                            <div class="col-sm-10">
+                              <input type="text" name="nome_pai" class="form-control">
+                            </div>
+                          </div>
+                          
+                          <div class="row mb-3">
+                            <label for="inputNumber" class="col-sm-2 col-form-label">CPF do pai</label>
+                            <div class="col-sm-10">
+                              <input type="number" name="cpf_pai" class="form-control" placeholder="000.000.000-00">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="inputNumber" class="col-sm-2 col-form-label">RG do pai</label>
+                            <div class="col-sm-10">
+                              <input type="number" name="rg_pai" class="form-control" placeholder="00.000.000-0">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="inputNumber" class="col-sm-2 col-form-label">Telefone do pai</label>
+                            <div class="col-sm-10">
+                              <input type="number" name="telefone_pai" class="form-control" placeholder="(00)00000-0000">
+                            </div>
+                          </div>                                    
+                          <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Nome da mãe</label>
+                            <div class="col-sm-10">
+                              <input type="text" name="nome_mae" class="form-control">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="inputNumber" class="col-sm-2 col-form-label">CPF da mãe</label>
+                            <div class="col-sm-10">
+                              <input type="number" name="cpf_mae" class="form-control" placeholder="000.000.000-00">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="inputNumber" class="col-sm-2 col-form-label">RG da mãe</label>
+                            <div class="col-sm-10">
+                              <input type="number" name="rg_mae" class="form-control" placeholder="00.000.000-0">
+                            </div>
+                          </div>
+                          <div class="row mb-3">
+                            <label for="inputNumber" class="col-sm-2 col-form-label">Telefone da mãe</label>
+                            <div class="col-sm-10">
+                              <input type="number" name="telefone_mae" class="form-control" placeholder="(00)00000-0000">
+                            </div>
+                          </div>  
+                          <div class="text-center">
+                            <button type="submit" class="btn btn-primary" value='cadastrar'>Enviar</button>
+                            <button type="reset" class="btn btn-secondary">Resetar</button>
+                          </div>                                    
+                      </form><!-- End General Form Elements -->
+        
+                    </div>
+                  </div>
+                <!-- End Table with stripped rows -->
+  
+              
+            
+  
+          </div>
+        </div>
+      </section>
+  
+
+  </main>
+  <!-- ======= Footer ======= -->
+  
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static "vendor/apexcharts/apexcharts.min.js" %}"></script>
+  <script src="{% static "vendor/bootstrap/js/bootstrap.bundle.min.js" %}"></script>
+  <script src="{% static "vendor/chart.js/chart.umd.js" %}"></script>
+  <script src="{% static "vendor/echarts/echarts.min.js" %}"></script>
+  <script src="{% static "vendor/quill/quill.js" %}"></script>
+  <script src="{% static "vendor/simple-datatables/simple-datatables.js" %}"></script>
+  <script src="{% static "vendor/tinymce/tinymce.min.js" %}"></script>
+  <script src="{% static "vendor/php-email-form/validate.js" %}"></script>
+
+  <!-- Template Main JS File -->
+  <script src="{% static "js/main.js" %}"></script>
+
+
+</body>
+
+</html>

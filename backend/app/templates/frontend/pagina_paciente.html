@@ -1,0 +1,716 @@
+<html lang="en">
+  {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static "style.css" %}">   
+      <title>Clinica EH</title>
+      <meta content="" name="description">
+      <meta content="" name="keywords">
+    
+      <!-- Favicons -->
+  <link type="image/png" href="{% static "img/logo2a.PNG" %}" rel="icon">
+  <link href="{% static "img/logo.png" %}" rel="apple-touch-icon">
+    
+      <!-- Google Fonts -->
+      <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Vendor CSS Files -->
+  <link href="{% static "vendor/bootstrap/css/bootstrap.min.css" %}" rel="stylesheet">
+  <link href="{% static "vendor/bootstrap-icons/bootstrap-icons.css" %}" rel="stylesheet">
+  <link href="{% static "vendor/boxicons/css/boxicons.min.css" %}" rel="stylesheet">
+  <link href="{% static "vendor/quill/quill.snow.css" %}" rel="stylesheet">
+  <link href="{% static "vendor/quill/quill.bubble.css" %}" rel="stylesheet">
+  <link href="{% static "vendor/remixicon/remixicon.css" %}" rel="stylesheet">
+  <link href="{% static "vendor/simple-datatables/style.css" %}" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="{% static "css/style.css" %}" rel="stylesheet">
+  
+  <style>
+    #container {
+      position: relative;
+      width: 800px;
+      height: 600px;
+  }
+
+  #drawingCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1; /* Canvas abaixo */
+  }
+
+  #imageOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2; /* Imagem acima */
+      pointer-events: none; /* A imagem não impede o desenho no canvas */
+  }
+    .container {
+      width: 660px;
+      height: 387px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 138px 93px; /* Margem vertical e horizontal ao redor da grade */
+      box-sizing: border-box; /* Inclui padding no tamanho total do contêiner */
+  }
+
+  .grid {
+      display: grid;
+      grid-template-columns: repeat(16, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 2px; /* Espaço entre os blocos */
+      width: 100%;
+      height: 100%;
+  }
+
+  .block {
+      background-color: #cccccc;
+      border: 1px solid #999;
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+      box-sizing: border-box; /* Inclui padding e border no tamanho total do bloco */
+  }
+    .card-body span {
+        display: block;
+        margin-bottom: 5px;
+    }
+    @media (min-width: 768px) {
+        .card-body .row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .card-body span {
+            flex: 1;
+            min-width: 150px;
+            margin-bottom: 0;
+        }
+    }
+    .btn.active {
+      background-color: #28a745; /* Cor de fundo diferente para o botão ativo */
+      border: 2px solid #000;    /* Adiciona uma borda ao botão ativo */
+  }
+</style>
+
+  <!-- =======================================================
+  * Template Name: NiceAdmin
+  * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
+  * Updated: Apr 20 2024 with Bootstrap v5.3.3
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center" style="background-color:rgb(76, 87, 90);">
+
+    <div class="d-flex align-items-center justify-content-between" >
+      <a href="{% url 'index' %}" class="d-flex align-items-center">
+        <img src="{% static "img/clinicaeh.jpeg" %}" height="50px">
+      </a>
+      <i class="bi bi-list toggle-sidebar-btn"></i>
+    </div><!-- End Logo -->
+
+    <!-- End Search Bar -->
+
+    <nav class="header-nav ms-auto">
+      <ul class="d-flex align-items-center">
+
+        <li class="nav-item d-block d-lg-none">
+          <a class="nav-link nav-icon search-bar-toggle" href="#">
+            <i class="bi bi-search" style="color: rgb(53, 45, 45);"></i>
+          </a>
+        </li><!-- End Search Icon-->
+
+        
+
+        <li class="nav-item dropdown pe-3">
+
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+            <span class="d-none d-md-block dropdown-toggle ps-2" style="color: white;">{{ user.username }}</span>
+          </a><!-- End Profile Iamge Icon -->
+
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+            <li class="dropdown-header">
+              <h6>{{ user.username }}</h6>
+              <span>              {% if user.groups.all %}
+                {% for group in user.groups.all %}
+                    {{ group.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            {% else %}
+                Nenhum grupo
+            {% endif %}</span>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{% url 'pagina_usuario' %}">
+                <i class="bi bi-person"></i>
+                <span>Minha conta</span>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <form action="{% url 'logout' %}" method="POST" class="dropdown-item d-flex align-items-center" href="{% url 'logout' %}">{%csrf_token%}
+                <button class="dropdown-item d-flex align-items-center" type="submit">
+                  <i class="bi bi-box-arrow-right"></i>
+                  <span>Fazer logout</span>
+                </button>
+              </form>
+          </li>
+
+          </ul><!-- End Profile Dropdown Items -->
+        </li><!-- End Profile Nav -->
+
+      </ul>
+    </nav><!-- End Icons Navigation -->
+
+  </header><!-- End Header -->
+
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'index' %}">
+          <i class="bi bi-grid"></i>
+          <span>Dashboard</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+      <li class="nav-item">
+        <a class="nav-link " href="{% url 'pacientes' %}">
+          <i class="bi bi-person"></i>
+          <span>Pacientes</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'calendario' %}">
+          <i class="bi bi-calendar"></i>
+          <span>Calendario</span>
+        </a>
+      </li><!-- End Dashboard Nav -->
+      <li class="nav-item"></li>
+        <a class="nav-link collapsed" href="{% url 'financeiro' %}">
+          <i class="bi bi-currency-dollar"></i>
+          <span>Financeiro</span>
+        </a>
+      </li>
+            
+
+    </ul>
+
+  </aside><!-- End Sidebar-->
+
+  <main id="main" class="main">
+
+    
+      <div class="card">
+          <div class="card-body">
+              <h5 class="card-title">{{ object.Nome }}</h5>
+              <div class="row">
+                  <div>Numero do registro: {{object.id}}</div>
+                  <div>Data do cadastro: {{object.Data_cadastro}}</div>
+                  <div>CPF: {{object.CPF}}</div>
+                  <div>Data de nascimento: {{object.Data_Nascimento}}</div>
+                  <div>Local de nascimento: {{object.local_nascimento}}</div>
+                  <div>Genero: {{object.genero}}</div>
+                  <div>Estado Civil: {{object.Estado_civil}}</div>
+                  <div>Observações: {{object.observacoes}}</div>
+                  <div>D: {{object.Data_Nascimento}}</div>
+                  <div>CPF: {{object.CPF}}</div>
+                  <div>RG: {{object.RG}}</div>
+                  <div>Orgão Emissor: {{object.Orgao_emissor}}</div>
+                  <div>Convenio: {{object.Convenio}}</div>
+                  <div>Plano: {{object.Plano}}</div>
+                  <div>Data de Adesão: {{object.Data_adesao}}</div>
+                  <div>Nome do Pai: {{object.Nome_pai}}</div>
+                  <div>CPF do Pai: {{object.CPF_pai}}</div>
+                  <div>RG do Pai: {{object.RG_pai}}</div>
+                  <div>Telefone do Pai: {{object.Telefone_pai}}</div>
+                  <div>Nome da Mãe: {{object.Nome_mae}}</div>
+                  <div>CPF da mãe: {{object.Cpf_mae}}</div>
+                  <div>RG da mãe: {{object.Rg_mae}}</div>
+                  <div>CEP: {{object.CEP}}</div>
+                  <div>Endereço: {{object.Endereco}}</div>
+                  <div>Número: {{object.Numero}}</div>
+                  <div>Complemento: {{object.Complemento}}</div>
+                  <div>Bairro: {{object.Bairro}}</div>
+                  <div>Cidade: {{object.Cidade}}</div>
+                  <div>Estado: {{object.Estado}}</div>
+
+                
+
+              </div>
+              <div class="row">
+                <div>Clínica Odontologia Brezolini Kennedy</div>
+            </div>
+            <hr>
+            <div class="row">
+              <div>Contato: {{object.celular}} </div>
+              
+          </div>
+          <hr>
+          <div>
+            <h3 style="text-align: center;">Financeiro do Paciente</h3>
+            
+            
+                <form method="POST" id="transactionForm">
+                  {% csrf_token %}
+                  <input type="hidden" name="paciente" value="{{ paciente.id }}">  <!-- Adiciona o paciente como um campo oculto -->
+                  
+                  <div class="mb-3">
+                    <label for="description" class="form-label">Descrição</label>
+                    <input type="text" class="form-control" id="description" name="descricao" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="value" class="form-label">Valor</label>
+                    <input type="number" class="form-control" id="value" name="valor" step="0.01" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="type" class="form-label">Tipo</label>
+                    <select class="form-select" id="type" name="tipo" required>
+                      <option value="Entrada">Entrada</option>
+                      <option value="Saída">Saída</option>
+                    </select>
+                  </div>
+                  <div class="row mb-3">
+                    <label for="inputDate" class="form-label">Data de Cobrança (Primeira Parcela):</label>
+                    <div>
+                      <input type="date" name="data_de_cobranca" class="form-control">
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="parcelas" class="form-label">Número de Parcelas</label>
+                    <input type="number" class="form-control" id="parcelas" name="parcelas" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Adicionar</button>
+                </form>
+              
+            <table class="table">
+              <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Descrição</th>
+                    <th scope="col">Valor</th>
+                    <th scope="col">Numero de Parcelas</th>
+                    <th scope="col">Numero dessa parcela</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Data de Cobrança</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Ação</th>
+
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for transacao in transacoes %}
+                  <tr>
+                        
+                        
+                    <td>{{transacao.id}}</td>
+                    <td>{{transacao.descricao}}</td>
+                    <td>{{transacao.valor}} R$</td>
+                    <td>{{transacao.parcelas}}</td>
+                    <td>{{transacao.numero_parcela}}</td>
+                    <td>{{transacao.tipo}}</td>
+                    <td>{{transacao.data_de_cobranca}}</td>
+                    <td>
+                      <form action="{% url 'atualizar_status_paciente' transacao.id paciente.id %}" method="post">
+                        {% csrf_token %}
+                        <select name="status" onchange="this.form.submit()">
+                            <option value="Pendente" {% if transacao.status == 'Pendente' %} selected {% endif %}>Pendente</option>
+                            <option value="Pago" {% if transacao.status == 'Pago' %} selected {% endif %}>Pago</option>
+                        </select>
+                    </form>
+                    </td>
+                    <td>
+                      <a href="{% url 'deletar_financeiro' transacao.id %}" class="btn btn-danger btn-sm">
+                        <i class="bi bi-trash-fill"></i>
+                    </a>
+                    <!-- Botão para editar -->
+                    <a href="{% url 'editar_financeiro' transacao.id %}" class="btn btn-warning btn-sm">
+                      <i class="bi bi-pencil-fill"></i>
+                  </a>
+                     
+                  </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                      <td colspan="4">Nenhuma transação encontrada.</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+          
+          <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-3" style="background-color: white;">
+                    <div class="card-header text-center">Total de Entradas</div>
+                    <div class="card-body text-center">
+                        <h5 class="display-6">R$ {{ total_entrada }}</h5>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="col-md-4">
+                <div class="card mb-3" style="background-color: white;">
+                    <div class="card-header text-center">Total de Saídas</div>
+                    <div class="card-body text-center">
+                        <h5 class="display-6">R$ {{ total_saida }}</h5>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="col-md-4">
+                <div class="card mb-3" style="background-color: white;">
+                    <div class="card-header text-center">Saldo Total</div>
+                    <div class="card-body text-center">
+                        <h5 class="display-6">R$ {{ saldo_total }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div><br>*Valores não pagos não serão contabilizados
+        
+          
+          </div>
+          <hr>
+          <h3 style="text-align: center;">Consultas agendadas</h3>
+          {% if eventos %}
+          {% for evento in eventos %}
+              <li>
+                  <strong>{{ evento.title }}</strong><br>
+                  Início: {{ evento.start_time }}<br>
+                  Fim: {{ evento.end_time }}<br>
+                  Descrição: {{ evento.description }}
+              </li>
+          {% endfor %}
+      {% else %}
+          <li>Sem eventos associados.</li>
+      {% endif %}
+          </div><hr>
+          <h3 style="text-align: center;">Adicionar Anotações</h3>
+          <form method="post" style="margin-left: 1%;">
+            {% csrf_token %}
+            {{ form.as_p }}
+            
+            <!-- Campo oculto para o ID do paciente -->
+            <input type="hidden" name="paciente" value="{{ paciente.id }}">
+        
+            <button style="margin-left: 1%" class="btn btn-primary" type="submit">Salvar Anotação</button>
+        </form><hr>
+          <h3 style="text-align: center;">Anotações do paciente</h3>
+    <ul>
+        {% for anotacao in anotacoes %}
+        <li>
+          {{ anotacao.texto }} - {{ anotacao.data_criacao }}
+          
+          <a href="{% url 'delete_anotacao' paciente_id=paciente.id anotacao_id=anotacao.id %}" class="btn btn-danger btn-sm" style="float: right; margin-left: 10px; margin-right:10px">
+              <i class="bi bi-trash-fill"></i>
+          </a>
+          
+         
+      </li>
+        {% empty %}
+        <li>Nenhuma anotação registrada.</li>
+        {% endfor %}
+    </ul>
+    <hr>
+    <div>
+      <label for="color">Cor:</label>
+        <input type="color" id="color" value="#000000">
+        <label for="size">Tamanho:</label>
+        <input type="number" id="size" value="5" min="1" max="50">
+        <button id="eraser" class="btn" style="padding: 10px 20px; font-size: 16px; border: none; cursor: pointer; background-color: #007bff; color: white; transition: background-color 0.3s;">Borracha</button>
+        <button id="pen" class="btn" style="padding: 10px 20px; font-size: 16px; border: none; cursor: pointer; background-color: #007bff; color: white; transition: background-color 0.3s;">Caneta</button>
+    </div><p>*Usar o botão "Salvar Desenho" apos concluir a edição</p>
+  
+  <div id="container">
+      <canvas id="drawingCanvas" width="800" height="600" style="position: absolute; top: 0; left: 0; z-index: 1;"></canvas>
+      <img id="imageOverlay" src="{% static 'img/odontograma02.png' %}" width="800" height="600" alt="Imagem de Referência" style="position: absolute; top: 0; left: 0; z-index: 2;">
+  </div>
+  
+  <button id="saveDrawing" class="btn btn-primary">Salvar Desenho</button>
+  <ul>
+    <li style="margin-top: 10px">
+      <i class="fas fa-check-circle" style="color: green;"></i> 
+      Paciente não precisa de tratamento: preencher em verde.
+  </li>
+  <li>
+      <i class="fas fa-times-circle" style="color: red;"></i> 
+      Paciente precisa de tratamento: contornar em vermelho.
+  </li>
+  <li>
+      <i class="fas fa-info-circle" style="color: blue;"></i> 
+      Tratamento já realizado: preencher em azul.
+  </li>
+  <li>
+      <i class="fas fa-ellipsis-h" style="color: blue;"></i> 
+      Diastema: dois riscos verticais em azul.
+  </li>
+  <li>
+      <i class="fas fa-exclamation-triangle" style="color: red;"></i> 
+      Restauração em excesso: ziguezague em vermelho.
+  </li>
+  <li>
+      <i class="fas fa-times" style="color: black;"></i> 
+      Dente extraído: preencher em preto.
+  </li>
+  <li>
+      <i class="fas fa-circle" style="color: red;"></i> 
+      Lesão de cárie ativa: semicírculo horizontal vermelho (se apresentar cavidade deve ser contínuo, se não apresentar deve ser tracejado).
+  </li>
+  <li>
+      <i class="fas fa-circle" style="color: green;"></i> 
+      Lesão de cárie inativa: semicírculo horizontal verde (se apresentar cavidade deve ser contínuo, se não apresentar deve ser tracejado).
+  </li>
+  <li>
+      <i class="fas fa-random" style="color: green;"></i> 
+      Desgaste dental: riscos diagonais em verde, caso não seja necessário restauração, ou em vermelho, caso seja necessário.
+  </li>
+  <li>
+      <i class="fas fa-dot-circle" style="color: green;"></i> 
+      Restauração: preencher um círculo em verde.
+  </li>
+  <li>
+      <i class="fas fa-circle" style="color: red;"></i> 
+      Restauração provisória: circular em vermelho.
+  </li>
+  <li>
+      <i class="fas fa-asterisk" style="color: green;"></i> 
+      Afecção mucogengival: asterisco em verde.
+  </li>
+  <li>
+      <i class="fas fa-arrow-up" style="color: black;"></i> 
+      Inclinação dental: setas em formato de U (todas indicadas para a mesma direção).
+  </li>
+  <li>
+      <i class="fas fa-arrow-up" style="color: blue;"></i> 
+      Extrusão dental: duas setas azuis na vertical com sentidos opostos.
+  </li>
+
+  </ul>
+    <hr>
+      </div>
+  
+  <div class="card">
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        {{ pdf_form.as_p }}  <!-- Formulário para o upload do PDF -->
+        <button type="submit" class="btn btn-primary">Salvar</button>
+    </form>
+    <ul>
+      {% for pdf in pdf_uploads %}
+          <li>
+              <a href="{{ pdf.pdf_file.url }}" target="_blank">{{ pdf.pdf_file.name }}</a>  <!-- Link para o arquivo PDF -->
+              <a href="{% url 'delete_pdf' paciente_id=paciente.id pdf_id=pdf.id %}" class="btn btn-danger btn-sm" style="float: right; margin-left: 10px; margin-right:10px">
+                <i class="bi bi-trash-fill"></i>
+            </a>
+          </li>
+      {% empty %}
+          <li>Nenhum arquivo PDF salvo.</li>
+      {% endfor %}
+  </ul>
+    </div>
+  </div>
+ 
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  
+  
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static "vendor/apexcharts/apexcharts.min.js" %}"></script>
+  <script src="{% static "vendor/bootstrap/js/bootstrap.bundle.min.js" %}"></script>
+  <script src="{% static "vendor/chart.js/chart.umd.js" %}"></script>
+  <script src="{% static "vendor/echarts/echarts.min.js" %}"></script>
+  <script src="{% static "vendor/quill/quill.js" %}"></script>
+  <script src="{% static "vendor/simple-datatables/simple-datatables.js" %}"></script>
+  <script src="{% static "vendor/tinymce/tinymce.min.js" %}"></script>
+  <script src="{% static "vendor/php-email-form/validate.js" %}"></script>
+  
+
+  <!-- Template Main JS File -->
+  <script src="{% static "js/main.js" %}"></script>
+  
+  <script>
+    const dropArea = document.getElementById('drop-area');
+    const fileInput = document.getElementById('fileElem');
+
+    // Prevenir o comportamento padrão
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    // Adicionar ou remover a classe de destaque
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    // Lidar com o evento de soltar
+    dropArea.addEventListener('drop', handleDrop, false);
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlight() {
+        dropArea.style.background = '#e8f0fe'; // Muda a cor de fundo ao arrastar
+    }
+
+    function unhighlight() {
+        dropArea.style.background = ''; // Reseta a cor de fundo
+    }
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles(files);
+    }
+
+    dropArea.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        handleFiles(fileInput.files);
+    });
+
+    function handleFiles(files) {
+        const file = files[0];
+        if (file) {
+            // Atualiza o input de arquivo com o arquivo selecionado
+            fileInput.files = files; // Atualiza o input com os arquivos
+
+            // Exibe o nome do arquivo (opcional)
+            const fileLabel = document.getElementById('fileLabel');
+            fileLabel.textContent = file.name;
+        }
+    }
+</script>
+
+  
+  <script>
+    
+    
+    const canvas = document.getElementById('drawingCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let isErasing = false;
+
+    const colorInput = document.getElementById('color');
+    const sizeInput = document.getElementById('size');
+    const eraserButton = document.getElementById('eraser');
+    const penButton = document.getElementById('pen');
+
+    // Verificar se há uma imagem associada antes de tentar carregá-la
+    {% if odontograma.image %}
+    const img = new Image();
+    img.src = "{{ odontograma.image.url }}"; // URL da imagem do odontograma
+    img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height); // Desenha a imagem no canvas
+    };
+    {% endif %}
+
+    // Alternar para o modo borracha
+    eraserButton.addEventListener('click', () => {
+        isErasing = true;
+    });
+
+    // Alternar para o modo caneta
+    penButton.addEventListener('click', () => {
+        isErasing = false;
+    });
+
+    canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        draw(e);
+    });
+
+    canvas.addEventListener('mousemove', draw);
+
+    canvas.addEventListener('mouseup', () => {
+        isDrawing = false;
+        ctx.beginPath();
+    });
+
+    function draw(e) {
+        if (!isDrawing) return;
+
+        // Obter a posição correta do canvas
+        const rect = canvas.getBoundingClientRect();
+
+        ctx.lineWidth = sizeInput.value;
+        ctx.lineCap = 'round';
+
+        if (isErasing) {
+            // Apagar como no Paint
+            ctx.clearRect(e.clientX - rect.left - sizeInput.value / 2, 
+                         e.clientY - rect.top - sizeInput.value / 2, 
+                         sizeInput.value, 
+                         sizeInput.value);
+        } else {
+            // Desenhar normalmente
+            ctx.strokeStyle = colorInput.value;
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+    }
+
+    const saveButton = document.getElementById('saveDrawing');
+
+    saveButton.addEventListener('click', () => {
+        const canvasData = canvas.toDataURL(); // Converte o canvas para Base64
+        
+        // Cria um objeto de requisição POST
+        fetch("{% url 'salvar_desenho' paciente.id %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}', // Django requer o token CSRF para POSTs
+            },
+            body: JSON.stringify({ image: canvasData }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Desenho salvo com sucesso!");
+            } else {
+                alert("Erro ao salvar o desenho.");
+            }
+        })
+        .catch(error => console.error('Erro:', error));
+    });
+</script>
+
+</body>
+
+</html>

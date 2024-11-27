@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <title>Título da página</title>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    Aqui vai o código HTML que fará seu site aparecer.<br>
+    <select class="form-select" name="paciente" aria-label="Default select example">
+        <option value="" selected>Selecione um paciente</option>
+        {% for paciente in pacientes %}
+            <option value="{{ paciente.Nome }}">{{ paciente.Nome }}</option>
+        {% endfor %}
+    </select>
+  </body>
+</html>
